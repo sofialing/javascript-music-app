@@ -12,20 +12,35 @@
     <title>Music app</title>
 </head>
 
-<body class="bg-dark">
+<body>
 
     <main class="container my-5">
         <form id="search-form">
             <div class="form-group">
                 <div class="input-group mb-2">
-                    <input type="text" class="form-control" name="search"
-                        placeholder="Search for song, artist or album..." aria-label="" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" name="search" placeholder="Search music.." aria-label=""
+                        aria-describedby="basic-addon1">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
             </div>
+            <div class="form-check form-check-inline text-white">
+                <input class="form-check-input" type="checkbox" name="track" value="track" checked>
+                <label class="form-check-label" for="inlineCheckbox1">Tracks</label>
+            </div>
+            <div class="form-check form-check-inline text-white">
+                <input class="form-check-input" type="checkbox" name="artist" value="artist">
+                <label class="form-check-label" for="inlineCheckbox2">Artist</label>
+            </div>
+            <div class="form-check form-check-inline text-white">
+                <input class="form-check-input" type="checkbox" name="album" value="album">
+                <label class="form-check-label" for="inlineCheckbox2">Album</label>
+            </div>
         </form>
+
+        <section id="search-result" class="text-white my-5">
+        </section>
 
     </main>
 
