@@ -8,11 +8,9 @@ const albumsEl = document.querySelector('#albums');
 const artistsEl = document.querySelector('#artists');
 const tracksEl = document.querySelector('#tracks');
 
-const renderArtists = (artists, search) => {
+const renderAllArtists = artists => {
 	artistsEl.classList.remove('d-none');
 	artistsEl.querySelector('ul').innerHTML = '';
-	artistsEl.querySelector('header a').setAttribute('data-search', search);
-	artistsEl.querySelector('header a').setAttribute('data-type', 'artist');
 
 	if (!artists.length) {
 		searchResultEL.innerHTML += 'Nothing to display.';
@@ -32,11 +30,9 @@ const renderArtists = (artists, search) => {
 	});
 };
 
-const renderAlbums = (albums, search) => {
+const renderAllAlbums = albums => {
 	albumsEl.classList.remove('d-none');
 	albumsEl.querySelector('ul').innerHTML = '';
-	albumsEl.querySelector('header a').setAttribute('data-search', search);
-	albumsEl.querySelector('header a').setAttribute('data-type', 'album');
 
 	if (!albums.length) {
 		albumsEl.innerHTML += 'Nothing to display.';
@@ -56,11 +52,9 @@ const renderAlbums = (albums, search) => {
 	});
 };
 
-const renderTracks = (tracks, search) => {
+const renderAllTracks = tracks => {
 	tracksEl.classList.remove('d-none');
 	tracksEl.querySelector('ul').innerHTML = '';
-	tracksEl.querySelector('header a').setAttribute('data-search', search);
-	tracksEl.querySelector('header a').setAttribute('data-type', 'track');
 
 	if (!tracks.length) {
 		tracksEl.innerHTML += 'Nothing to display.';
@@ -104,22 +98,26 @@ const getSearchResults = async search => {
 	return { artists, albums, tracks };
 };
 
+const saveSearch = search => {
+	searchResultEL
+		.querySelectorAll('header a')
+		.forEach(a => a.setAttribute('data-search', search));
+};
+
 searchForm.addEventListener('submit', e => {
 	// Prevent default action
 	e.preventDefault();
 
 	// Get search value
 	const search = searchForm.search.value.trim().toLowerCase();
+	saveSearch(search);
 
 	// Get search result and render to page
 	getSearchResults(search)
 		.then(({ artists, albums, tracks }) => {
-			console.log('artists', artists);
-			console.log('albums', albums);
-			console.log('tracks', tracks);
-			renderArtists(artists.data, search);
-			renderAlbums(albums.data, search);
-			renderTracks(tracks.data, search);
+			renderAllArtists(artists.data);
+			renderAllAlbums(albums.data);
+			renderAllTracks(tracks.data);
 		})
 		.catch(err => {
 			console.log(err);
