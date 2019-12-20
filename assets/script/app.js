@@ -152,6 +152,35 @@ const fetchData = async query => {
 	return await response.json();
 };
 
+const getAlbumInfo = async id => {
+	return await fetchData(`album/${id}`);
+};
+
+const renderAlbum = album => {
+	const { artist, genres, tracks } = album;
+	const albumEl = document.querySelector('#album');
+	albumEl.querySelector('ul').innerHTML = '';
+	albumEl.querySelector('img').src = album.cover_big;
+	albumEl.querySelector('#album-by').innerText = artist.name;
+	albumEl.querySelector('a').setAttribute('data-artist', artist.id);
+	albumEl.querySelector('#album-released').innerText = album.release_date;
+	albumEl.querySelector('#album-title').innerText = album.title;
+	albumEl.querySelector('#album-genres').innerText = genres.data
+		.map(genre => genre.name)
+		.join(', ');
+
+	tracks.data.forEach((track, i) => {
+		let duration = moment.unix(track.duration).format('m:ss');
+		albumEl.querySelector('ul').innerHTML += `
+			<li class="list-group-item list-group-item-dark list-group-item-small">
+			<p class="mb-0"><span class="mr-2">${i + 1}.</span> ${track.title}</p>
+			<p class="mb-0 text-muted">${duration}<i class="far fa-play-circle ml-4 text-white"></i></p>
+			</li>`;
+	});
+
+	albumEl.classList.remove('d-none');
+};
+
 searchForm.addEventListener('submit', e => {
 	// Prevent default action
 	e.preventDefault();
@@ -175,6 +204,7 @@ searchForm.addEventListener('submit', e => {
 	// Reset form
 	searchForm.reset();
 	document.querySelector('#artist').classList.add('d-none');
+	document.querySelector('#album').classList.add('d-none');
 });
 
 document.querySelector('main').addEventListener('click', async e => {
@@ -182,6 +212,8 @@ document.querySelector('main').addEventListener('click', async e => {
 
 	if (e.target.tagName === 'A' || e.target.parentElement.tagName === 'A') {
 		searchResultEL.classList.add('d-none');
+		document.querySelector('#artist').classList.add('d-none');
+		document.querySelector('#album').classList.add('d-none');
 	}
 
 	// Get data related to selected artist
@@ -190,6 +222,16 @@ document.querySelector('main').addEventListener('click', async e => {
 			.then(({ artist, tracklist, albums }) => {
 				clearInfo('.artist-info');
 				renderArtist(artist, tracklist.data, albums);
+			})
+			.catch(err => console.log(err));
+	}
+
+	// Get data related to selected album
+	if (e.target.dataset.album) {
+		getAlbumInfo(e.target.dataset.album)
+			.then(album => {
+				clearInfo('.album-info');
+				renderAlbum(album);
 			})
 			.catch(err => console.log(err));
 	}
