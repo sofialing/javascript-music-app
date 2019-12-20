@@ -8,6 +8,7 @@ const albumsEl = document.querySelector('#albums');
 const artistsEl = document.querySelector('#artists');
 const tracksEl = document.querySelector('#tracks');
 
+// Render all artists related to search result
 const renderAllArtists = artists => {
 	artistsEl.classList.remove('d-none');
 	artistsEl.querySelector('ul').innerHTML = '';
@@ -30,6 +31,7 @@ const renderAllArtists = artists => {
 	});
 };
 
+// Render all albums related to search result
 const renderAllAlbums = albums => {
 	albumsEl.classList.remove('d-none');
 	albumsEl.querySelector('ul').innerHTML = '';
@@ -52,6 +54,7 @@ const renderAllAlbums = albums => {
 	});
 };
 
+// Render all tracks related to search result
 const renderAllTracks = tracks => {
 	tracksEl.classList.remove('d-none');
 	tracksEl.querySelector('ul').innerHTML = '';
@@ -69,38 +72,72 @@ const renderAllTracks = tracks => {
 				<div>
 					<p class="mb-0">${track.title}</p>
 					<p class="text-muted mb-0">
-						<a href="#" data-artist="${track.artist.id}">${track.artist.name}</a>, 
+						<a href="#" data-artist="${track.artist.id}">${track.artist.name}</a>,
 						<a href="#" data-album="${track.album.id}">${track.album.title}</a></p>
 				</div>
 			</li>`;
 	});
 };
 
-const renderArtist = (artist, tracklist, albums) => {
-	const artistEl = document.querySelector('#artist');
-	artistEl.querySelector('img').src = artist.picture_xl;
-	artistEl.querySelector('#fans').innerText = `${artist.nb_fan} fans`;
-	artistEl.querySelector('h1').innerText = artist.name;
-	artistEl.querySelector('ul').innerHTML = '';
-	artistEl.querySelector('#discography').innerHTML = '';
+// Render tracklist used for artist & album info
+const renderTrackList = (tracks, el) => {
+	// Clear list
+	el.querySelector('ul').innerHTML = '';
 
-	tracklist.forEach((track, i) => {
+	// Add tracks to list
+	tracks.forEach((track, i) => {
 		let duration = moment.unix(track.duration).format('m:ss');
-		artistEl.querySelector('ul').innerHTML += `
+		el.querySelector('ul').innerHTML += `
 			<li class="list-group-item list-group-item-dark list-group-item-small">
-				<p class="mb-0"><span class="mr-2">${i + 1}.</span> ${track.title}</p>
-				<p class="mb-0 text-muted">${duration}<i class="far fa-play-circle ml-4 text-white"></i></p>
+			<p class="mb-0"><span class="mr-2">${i + 1}.</span> ${track.title}</p>
+			<p class="mb-0 text-muted">${duration}<i class="far fa-play-circle ml-4 text-white"></i></p>
 			</li>`;
 	});
+};
 
+// Render album list
+const renderAlbumList = (albums, el) => {
 	albums.forEach(album => {
-		artistEl.querySelector('#discography').innerHTML += `
+		el.querySelector('#discography').innerHTML += `
 			<div>
 				<a href="#" data-album="${album.id}">
 				<img src="${album.cover_big}" data-album="${album.id}">
 				</a>
 			</div>`;
 	});
+};
+
+// Render album info to page
+const renderAlbum = album => {
+	const { artist, genres, tracks } = album;
+	const albumEl = document.querySelector('#album');
+	albumEl.querySelector('img').src = album.cover_big;
+	albumEl.querySelector('#album-by').innerText = artist.name;
+	albumEl.querySelector('#album-by').setAttribute('data-artist', artist.id);
+	albumEl.querySelector('#album-released').innerText = album.release_date;
+	albumEl.querySelector('#album-title').innerText = album.title;
+	albumEl.querySelector('#album-genres').innerText = genres.data
+		.map(genre => genre.name)
+		.join(', ');
+
+	renderTrackList(tracks.data, albumEl);
+
+	// Display element
+	albumEl.classList.remove('d-none');
+};
+
+// Render artist info to page
+const renderArtist = (artist, tracks, albums) => {
+	const artistEl = document.querySelector('#artist');
+	artistEl.querySelector('img').src = artist.picture_xl;
+	artistEl.querySelector('#fans').innerText = `${artist.nb_fan} fans`;
+	artistEl.querySelector('h1').innerText = artist.name;
+	artistEl.querySelector('#discography').innerHTML = '';
+
+	renderTrackList(tracks, artistEl);
+	renderAlbumList(albums, artistEl);
+
+	// Display element
 	artistEl.classList.remove('d-none');
 };
 
@@ -114,13 +151,9 @@ const getArtistInfo = async id => {
 	return { artist, tracklist, albums };
 };
 
-// Clear HTML elements
-const clearInfo = element => {
-	const elements = document.querySelectorAll(element);
-	elements.forEach(el => {
-		el.innerHTML = '';
-		if (el.tagName === 'IMG') el.src = '';
-	});
+// Get all data related to specific album
+const getAlbumInfo = async id => {
+	return await fetchData(`album/${id}`);
 };
 
 // Get search results based on user input
@@ -141,6 +174,15 @@ const saveSearch = search => {
 		.forEach(a => a.setAttribute('data-search', search));
 };
 
+// Clear HTML elements
+const clearInfo = element => {
+	const elements = document.querySelectorAll(element);
+	elements.forEach(el => {
+		el.innerHTML = '';
+		if (el.tagName === 'IMG') el.src = '';
+	});
+};
+
 // Fetch data based on query-string
 const fetchData = async query => {
 	const response = await fetch(`https://api.deezer.com/${query}`);
@@ -150,35 +192,6 @@ const fetchData = async query => {
 	}
 
 	return await response.json();
-};
-
-const getAlbumInfo = async id => {
-	return await fetchData(`album/${id}`);
-};
-
-const renderAlbum = album => {
-	const { artist, genres, tracks } = album;
-	const albumEl = document.querySelector('#album');
-	albumEl.querySelector('ul').innerHTML = '';
-	albumEl.querySelector('img').src = album.cover_big;
-	albumEl.querySelector('#album-by').innerText = artist.name;
-	albumEl.querySelector('a').setAttribute('data-artist', artist.id);
-	albumEl.querySelector('#album-released').innerText = album.release_date;
-	albumEl.querySelector('#album-title').innerText = album.title;
-	albumEl.querySelector('#album-genres').innerText = genres.data
-		.map(genre => genre.name)
-		.join(', ');
-
-	tracks.data.forEach((track, i) => {
-		let duration = moment.unix(track.duration).format('m:ss');
-		albumEl.querySelector('ul').innerHTML += `
-			<li class="list-group-item list-group-item-dark list-group-item-small">
-			<p class="mb-0"><span class="mr-2">${i + 1}.</span> ${track.title}</p>
-			<p class="mb-0 text-muted">${duration}<i class="far fa-play-circle ml-4 text-white"></i></p>
-			</li>`;
-	});
-
-	albumEl.classList.remove('d-none');
 };
 
 searchForm.addEventListener('submit', e => {
@@ -211,9 +224,9 @@ document.querySelector('main').addEventListener('click', async e => {
 	e.preventDefault();
 
 	if (e.target.tagName === 'A' || e.target.parentElement.tagName === 'A') {
-		searchResultEL.classList.add('d-none');
-		document.querySelector('#artist').classList.add('d-none');
-		document.querySelector('#album').classList.add('d-none');
+		document
+			.querySelectorAll('main section')
+			.forEach(section => section.classList.add('d-none'));
 	}
 
 	// Get data related to selected artist
