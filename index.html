@@ -27,8 +27,31 @@
             </div>
         </form>
 
-        <main>
-            <section id="search-result" class="text-white mt-4 mb-5 d-none">
+        <main class="text-white">
+            <div id="search-result-wrapper">
+                <section id="search-artists" class="my-4 d-none">
+                    <header class="d-flex justify-content-between">
+                        <h2 class="h6 font-weight-normal">Artists</h2>
+                        <small class="text-muted text-uppercase"><a href="#" data-type="artist">Show all</a></small>
+                    </header>
+                    <ul class="list-group"></ul>
+                </section>
+                <section id="search-tracks" class="my-4 d-none">
+                    <header class="d-flex justify-content-between">
+                        <h2 class="h6 font-weight-normal">Tracks</h2>
+                        <small class="text-muted text-uppercase"><a href="#" data-type="track">Show all</a></small>
+                    </header>
+                    <ul class="list-group"></ul>
+                </section>
+                <section id="search-albums" class="my-4 d-none">
+                    <header class="d-flex justify-content-between">
+                        <h2 class="h6 font-weight-normal">Albums</h2>
+                        <small class="text-muted text-uppercase"><a href="#" data-type="album">Show all</a></small>
+                    </header>
+                    <ul class="list-group"></ul>
+                </section>
+            </div>
+            <!-- <section id="search-result" class="text-white mt-4 mb-5 d-none">
                 <div id="artists" class="my-4">
                     <header class="d-flex justify-content-between">
                         <h2 class="h6 font-weight-normal">Artists</h2>
@@ -50,7 +73,7 @@
                     </header>
                     <ul class="list-group"></ul>
                 </div>
-            </section>
+            </section> -->
 
             <section id="artist" class="text-white mt-4 mb-5 d-none">
                 <header>
