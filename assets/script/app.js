@@ -13,7 +13,7 @@ const renderAllArtists = artists => {
 	artistsEl.querySelector('ul').innerHTML = '';
 
 	if (!artists.length) {
-		searchResultEL.innerHTML += 'Nothing to display.';
+		artistsEl.innerHTML += 'Nothing to display.';
 		return;
 	}
 
@@ -76,15 +76,51 @@ const renderAllTracks = tracks => {
 	});
 };
 
-// Fetch data based on query-string
-const fetchData = async query => {
-	const response = await fetch(`https://api.deezer.com/${query}`);
+const renderArtist = (artist, tracklist, albums) => {
+	const artistEl = document.querySelector('#artist');
+	artistEl.querySelector('img').src = artist.picture_xl;
+	artistEl.querySelector('#fans').innerText = `${artist.nb_fan} fans`;
+	artistEl.querySelector('h1').innerText = artist.name;
+	artistEl.querySelector('ul').innerHTML = '';
+	artistEl.querySelector('#discography').innerHTML = '';
 
-	if (!response.ok) {
-		throw new Error('Response was not ok.');
-	}
+	tracklist.forEach((track, i) => {
+		let duration = moment.unix(track.duration).format('m:ss');
+		artistEl.querySelector('ul').innerHTML += `
+			<li class="list-group-item list-group-item-dark list-group-item-small">
+				<p class="mb-0"><span class="mr-2">${i + 1}.</span> ${track.title}</p>
+				<p class="mb-0 text-muted">${duration}<i class="far fa-play-circle ml-4 text-white"></i></p>
+			</li>`;
+	});
 
-	return await response.json();
+	albums.forEach(album => {
+		artistEl.querySelector('#discography').innerHTML += `
+			<div>
+				<a href="#" data-album="${album.id}">
+				<img src="${album.cover_big}" data-album="${album.id}">
+				</a>
+			</div>`;
+	});
+	artistEl.classList.remove('d-none');
+};
+
+// Get all data related to specific artist
+const getArtistInfo = async id => {
+	const artist = await fetchData(`artist/${id}`);
+	const tracklist = await fetchData(`artist/${id}/top?limit=5`);
+	let albums = await fetchData(`search/album?q=${artist.name}`);
+	albums = albums.data.filter(album => album.artist.name == artist.name);
+
+	return { artist, tracklist, albums };
+};
+
+// Clear HTML elements
+const clearInfo = element => {
+	const elements = document.querySelectorAll(element);
+	elements.forEach(el => {
+		el.innerHTML = '';
+		if (el.tagName === 'IMG') el.src = '';
+	});
 };
 
 // Get search results based on user input
@@ -98,10 +134,22 @@ const getSearchResults = async search => {
 	return { artists, albums, tracks };
 };
 
+// Add search string to data-attribute
 const saveSearch = search => {
 	searchResultEL
 		.querySelectorAll('header a')
 		.forEach(a => a.setAttribute('data-search', search));
+};
+
+// Fetch data based on query-string
+const fetchData = async query => {
+	const response = await fetch(`https://api.deezer.com/${query}`);
+
+	if (!response.ok) {
+		throw new Error('Response was not ok.');
+	}
+
+	return await response.json();
 };
 
 searchForm.addEventListener('submit', e => {
@@ -118,6 +166,7 @@ searchForm.addEventListener('submit', e => {
 			renderAllArtists(artists.data);
 			renderAllAlbums(albums.data);
 			renderAllTracks(tracks.data);
+			searchResultEL.classList.remove('d-none');
 		})
 		.catch(err => {
 			console.log(err);
@@ -125,4 +174,23 @@ searchForm.addEventListener('submit', e => {
 
 	// Reset form
 	searchForm.reset();
+	document.querySelector('#artist').classList.add('d-none');
+});
+
+document.querySelector('main').addEventListener('click', async e => {
+	e.preventDefault();
+
+	if (e.target.tagName === 'A' || e.target.parentElement.tagName === 'A') {
+		searchResultEL.classList.add('d-none');
+	}
+
+	// Get data related to selected artist
+	if (e.target.dataset.artist) {
+		getArtistInfo(e.target.dataset.artist)
+			.then(({ artist, tracklist, albums }) => {
+				clearInfo('.artist-info');
+				renderArtist(artist, tracklist.data, albums);
+			})
+			.catch(err => console.log(err));
+	}
 });

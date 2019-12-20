@@ -14,45 +14,61 @@
 
 <body>
 
-    <main class="container my-4">
+    <div class="container my-4">
         <form id="search-form" class="text-center">
             <div class="form-group">
                 <div class="input-group mb-2">
-                    <input type="text" class="form-control" name="search"
-                        placeholder="Search for tracks, albums or artist..." aria-label=""
-                        aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" name="search" placeholder="Search for music..."
+                        aria-label="" aria-describedby="basic-addon1">
                     <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                        <button class="btn btn-info px-3" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
             </div>
         </form>
 
-        <section id="search-result" class="text-white mt-4 mb-5">
-            <div id="artists" class="d-none my-4">
-                <header class="d-flex justify-content-between">
-                    <h2 class="h6 font-weight-normal">Artists</h2>
-                    <small class="text-muted"><a href="" data-type="artist">Show all</a></small>
-                </header>
-                <ul class="list-group"></ul>
-            </div>
-            <div id="tracks" class="d-none my-4">
-                <header class="d-flex justify-content-between">
-                    <h2 class="h6 font-weight-normal">Tracks</h2>
-                    <small class="text-muted"><a href="" data-type="track">Show all</a></small>
-                </header>
-                <ul class="list-group"></ul>
-            </div>
-            <div id="albums" class="d-none my-4">
-                <header class="d-flex justify-content-between">
-                    <h2 class="h6 font-weight-normal">Albums</h2>
-                    <small class="text-muted"><a href="" data-type="album">Show all</a></small>
-                </header>
-                <ul class="list-group"></ul>
-            </div>
-        </section>
+        <main>
+            <section id="search-result" class="text-white mt-4 mb-5 d-none">
+                <div id="artists" class="my-4">
+                    <header class="d-flex justify-content-between">
+                        <h2 class="h6 font-weight-normal">Artists</h2>
+                        <small class="text-muted text-uppercase"><a href="#" data-type="artist">Show all</a></small>
+                    </header>
+                    <ul class="list-group"></ul>
+                </div>
+                <div id="tracks" class="my-4">
+                    <header class="d-flex justify-content-between">
+                        <h2 class="h6 font-weight-normal">Tracks</h2>
+                        <small class="text-muted text-uppercase"><a href="#" data-type="track">Show all</a></small>
+                    </header>
+                    <ul class="list-group"></ul>
+                </div>
+                <div id="albums" class="my-4">
+                    <header class="d-flex justify-content-between">
+                        <h2 class="h6 font-weight-normal">Albums</h2>
+                        <small class="text-muted text-uppercase"><a href="#" data-type="album">Show all</a></small>
+                    </header>
+                    <ul class="list-group"></ul>
+                </div>
+            </section>
 
-    </main>
+            <section id="artist" class="text-white mt-4 mb-5 d-none">
+                <header>
+                    <img src="" class="artist-info mb-3">
+                    <div class="d-flex justify-content-between">
+                        <small class="text-uppercase">Artist</small>
+                        <small class="text-uppercase artist-info" id="fans"></small>
+                    </div>
+                    <h1 class="mb-3 font-weight-bolder artist-info" id="artist-name"></h1>
+                </header>
+                <h2 class="h5 mb-3">Top tracks</h2>
+                <ul class="list-group mb-4"></ul>
+                <h2 class="h5 mb-3">Discography</h2>
+                <div id="discography" class="artist-info"></div>
+            </section>
+        </main>
+
+    </div>
 
     <script src="assets/script/moment.min.js"></script>
     <script src="assets/script/app.js"></script>
