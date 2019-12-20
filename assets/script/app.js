@@ -3,10 +3,11 @@
  *
  */
 const searchForm = document.querySelector('#search-form');
-const searchResultEL = document.querySelector('#search-result');
-const albumsEl = document.querySelector('#albums');
-const artistsEl = document.querySelector('#artists');
-const tracksEl = document.querySelector('#tracks');
+// const searchResultEL = document.querySelector('#search-result');
+const searchResultEL = document.querySelector('#search-result-wrapper');
+const albumsEl = document.querySelector('#search-albums');
+const artistsEl = document.querySelector('#search-artists');
+const tracksEl = document.querySelector('#search-tracks');
 
 // Render all artists related to search result
 const renderAllArtists = artists => {
@@ -167,6 +168,10 @@ const getSearchResults = async search => {
 	return { artists, albums, tracks };
 };
 
+const getAllSearchResults = async search => {
+	return await fetchData(search);
+};
+
 // Add search string to data-attribute
 const saveSearch = search => {
 	searchResultEL
@@ -208,7 +213,6 @@ searchForm.addEventListener('submit', e => {
 			renderAllArtists(artists.data);
 			renderAllAlbums(albums.data);
 			renderAllTracks(tracks.data);
-			searchResultEL.classList.remove('d-none');
 		})
 		.catch(err => {
 			console.log(err);
@@ -227,6 +231,28 @@ document.querySelector('main').addEventListener('click', async e => {
 		document
 			.querySelectorAll('main section')
 			.forEach(section => section.classList.add('d-none'));
+	}
+
+	// Get all search results
+	if (e.target.dataset.search) {
+		const search = e.target.dataset.search;
+		const type = e.target.dataset.type;
+
+		getAllSearchResults(`search/${type}?q=${search}`)
+			.then(res => {
+				switch (type) {
+					case 'album':
+						renderAllAlbums(res.data);
+						break;
+					case 'artist':
+						renderAllArtists(res.data);
+						break;
+					case 'track':
+						renderAllTracks(res.data);
+						break;
+				}
+			})
+			.catch(err => console.log(err));
 	}
 
 	// Get data related to selected artist
