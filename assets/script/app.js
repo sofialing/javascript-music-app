@@ -7,6 +7,7 @@ const searchResultEL = document.querySelector('#search-result-wrapper');
 const albumsEl = document.querySelector('#search-albums');
 const artistsEl = document.querySelector('#search-artists');
 const tracksEl = document.querySelector('#search-tracks');
+const errorEl = document.querySelector('#search-error');
 
 // Fetch data based on query-string
 const getData = async url => {
@@ -26,32 +27,47 @@ const getData = async url => {
 };
 
 // Get search results for artists
-const searchArtists = async (search, limit = '') => {
-	return await getData(
-		`https://deezerdevs-deezer.p.rapidapi.com/search/artist?q=${search}${limit}`
+const searchArtists = async search => {
+	const artists = await getData(
+		`https://deezerdevs-deezer.p.rapidapi.com/search/artist?q=${search}`
 	);
+
+	if (artists.error) {
+		throw new Error('Could not fetch artists.');
+	}
+	return artists;
 };
 
 // Get search results for albums
-const searchAlbums = async (search, limit = '') => {
-	return await getData(
-		`https://deezerdevs-deezer.p.rapidapi.com/search/album?q=${search}${limit}`
+const searchAlbums = async search => {
+	const albums = await getData(
+		`https://deezerdevs-deezer.p.rapidapi.com/search/album?q=${search}`
 	);
+
+	if (albums.error) {
+		throw new Error('Could not fetch albums.');
+	}
+	return albums;
 };
 
 // Get search results for tracks
-const searchTracks = async (search, limit = '') => {
-	return await getData(
-		`https://deezerdevs-deezer.p.rapidapi.com/search/track?q=${search}${limit}`
+const searchTracks = async search => {
+	const tracks = await getData(
+		`https://deezerdevs-deezer.p.rapidapi.com/search/track?q=${search}`
 	);
+
+	if (tracks.error) {
+		throw new Error('Could not fetch tracks.');
+	}
+	return tracks;
 };
 
 // Collect search results for artist, albums and tracks, limited to 5 items each
 const searchAll = async search => {
 	return {
-		artists: await searchArtists(search, '&limit=5'),
-		albums: await searchAlbums(search, '&limit=5'),
-		tracks: await searchTracks(search, '&limit=5')
+		artists: await searchArtists(`${search}&limit=5`),
+		albums: await searchAlbums(`${search}&limit=5`),
+		tracks: await searchTracks(`${search}&limit=5`)
 	};
 };
 
@@ -197,6 +213,7 @@ const clearInfo = element => {
 
 // Add 'display none' to all section elements
 const hideElements = () => {
+	console.log('applying d-none to sections');
 	document
 		.querySelectorAll('section')
 		.forEach(section => section.classList.add('d-none'));
@@ -205,21 +222,35 @@ const hideElements = () => {
 const handleSearchResults = searchResults => {
 	const { artists = false, albums = false, tracks = false } = searchResults;
 
-	if (artists) {
+	// If results contains artists
+	if (artists && artists.total) {
 		artistsEl.querySelector('ul').innerHTML = '';
 		artistsEl.classList.remove('d-none');
 		artists.data.forEach(artist => renderArtistResult(artist));
 	}
-	if (albums) {
+	// If results contains albums
+	if (albums && albums.total) {
 		albumsEl.querySelector('ul').innerHTML = '';
 		albumsEl.classList.remove('d-none');
 		albums.data.forEach(album => renderAlbumResult(album));
 	}
-	if (tracks) {
+	// If results contains tracks
+	if (tracks && tracks.total) {
 		tracksEl.querySelector('ul').innerHTML = '';
 		tracksEl.classList.remove('d-none');
 		tracks.data.forEach(track => renderTrackResult(track));
 	}
+	// If no results to show
+	if (!(artists.total || albums.total || tracks.total)) {
+		errorEl.classList.remove('d-none');
+		errorEl.innerHTML = 'Nothing to display';
+	}
+};
+
+// Handle error
+const handleError = err => {
+	errorEl.classList.remove('d-none');
+	errorEl.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
 };
 
 searchForm.addEventListener('submit', e => {
@@ -237,13 +268,14 @@ searchForm.addEventListener('submit', e => {
 	// Search based on user input and handle results
 	searchAll(search)
 		.then(handleSearchResults)
-		.catch(err => console.log(err));
+		.catch(handleError);
 });
 
 document.querySelector('main').addEventListener('click', async e => {
 	// Prevent default action
 	e.preventDefault();
 
+	// Return if clicked element or parent element is not an a-tag
 	if (!(e.target.tagName === 'A' || e.target.parentElement.tagName === 'A')) {
 		return;
 	}
@@ -261,17 +293,17 @@ document.querySelector('main').addEventListener('click', async e => {
 			case 'artist':
 				searchArtists(search)
 					.then(res => handleSearchResults({ artists: res }))
-					.catch(err => console.log(err));
+					.catch(handleError);
 				break;
 			case 'album':
 				searchAlbums(search)
 					.then(res => handleSearchResults({ albums: res }))
-					.catch(err => console.log(err));
+					.catch(handleError);
 				break;
 			case 'track':
 				searchTracks(search)
 					.then(res => handleSearchResults({ tracks: res }))
-					.catch(err => console.log(err));
+					.catch(handleError);
 				break;
 		}
 	}
@@ -284,7 +316,7 @@ document.querySelector('main').addEventListener('click', async e => {
 		// Get artist info and render to page
 		getArtistInfo(e.target.dataset.artist)
 			.then(renderArtistInfo)
-			.catch(err => console.log(err));
+			.catch(handleError);
 	}
 
 	// Check if element has data attribute 'album'
@@ -295,6 +327,6 @@ document.querySelector('main').addEventListener('click', async e => {
 		// Get album info and render to page
 		getAlbumInfo(e.target.dataset.album)
 			.then(renderAlbumInfo)
-			.catch(err => console.log(err));
+			.catch(handleError);
 	}
 });
