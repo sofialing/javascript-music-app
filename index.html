@@ -14,7 +14,7 @@
 
 <body>
 
-    <div class="container my-4">
+    <div class="container my-5">
         <form id="search-form" class="text-center">
             <div class="form-group">
                 <div class="input-group mb-2">
@@ -27,65 +27,13 @@
             </div>
         </form>
 
-        <main class="text-white">
-            <div id="search-result-wrapper">
-                <section id="search-artists" class="my-4 d-none">
-                    <header class="d-flex justify-content-between">
-                        <h2 class="h6 font-weight-normal">Artists</h2>
-                        <small class="text-muted text-uppercase"><a href="#" data-type="artist">Show all</a></small>
-                    </header>
-                    <ul class="list-group"></ul>
-                </section>
-                <section id="search-tracks" class="my-4 d-none">
-                    <header class="d-flex justify-content-between">
-                        <h2 class="h6 font-weight-normal">Tracks</h2>
-                        <small class="text-muted text-uppercase"><a href="#" data-type="track">Show all</a></small>
-                    </header>
-                    <ul class="list-group"></ul>
-                </section>
-                <section id="search-albums" class="my-4 d-none">
-                    <header class="d-flex justify-content-between">
-                        <h2 class="h6 font-weight-normal">Albums</h2>
-                        <small class="text-muted text-uppercase"><a href="#" data-type="album">Show all</a></small>
-                    </header>
-                    <ul class="list-group"></ul>
-                </section>
-                <section id="search-error" class="d-none mt-4"></section>
-            </div>
-
-            <section id="artist" class="text-white mt-4 mb-5 d-none">
-                <header>
-                    <img src="" class="artist-info mb-3">
-                    <div class="d-flex justify-content-between">
-                        <small class="text-uppercase">Artist</small>
-                        <small class="text-uppercase artist-info" id="fans"></small>
-                    </div>
-                    <h1 class="mb-3 font-weight-bolder artist-info" id="artist-name"></h1>
-                </header>
-                <h2 class="h5 mb-3">Top tracks</h2>
-                <ul class="list-group mb-4"></ul>
-                <h2 class="h5 mb-3">Discography</h2>
-                <div id="discography" class="artist-info"></div>
-            </section>
-
-            <section id="album" class="text-white mt-4 mb-5 d-none">
-                <header class="mb-4">
-                    <img src="" class="album-info mb-3">
-                    <div class="d-flex justify-content-between">
-                        <small class="text-uppercase">Album by <a href="#" id="album-by" data-artist=""></a></small>
-                    </div>
-                    <h1 class="mb-2 font-weight-bolder album-info" id="album-title"></h1>
-                    <small class="text-uppercase">Released <span id="album-released" class="album-info"></span>.</small>
-                    <small class="text-uppercase">Genre: <span id="album-genres" class="album-info"></span>.</small>
-                </header>
-                <h2 class="h5 mb-3">Tracks</h2>
-                <ul class="list-group mb-4"></ul>
-            </section>
-        </main>
+        <main class="text-white my-5"></main>
 
     </div>
 
     <script src="assets/script/moment.min.js"></script>
+    <script src="assets/script/music-search.js"></script>
+    <script src="assets/script/music-ui.js"></script>
     <script src="assets/script/app.js"></script>
 </body>
 

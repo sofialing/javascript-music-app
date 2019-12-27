@@ -94,3 +94,14 @@ img {
 	padding: 0.5rem 0.5rem;
 	border-bottom: none;
 }
+
+header {
+	display: flex;
+	justify-content: space-between;
+
+	a {
+		color: #a6a6a6;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+}
